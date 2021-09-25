@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <script src="file_data.js"></script>
+        <script src="menu_sections.js"></script>
+        <script src="script.js"></script>
+        <script src="jscolor.js"></script>
+        <script src="FileSaver.js"></script>
+        <script src="jszip.js"></script>
+        <script src="moment.js"></script>
+        <script src="tga.js"></script>
+        <script src="listbox.js"></script>
+        <script src="utils.js"></script>
+        <script src="listbox-scrollable.js"></script>
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body>
+        <div class="content">
+            <div class="logo">
+                <a href="index.html">
+                    <img class="color-logo" src="images/gfx/logo-full.svg">
+                </a>
+            </div>
+            <div class="menu">
+                <button class="tab" onclick="tab('About', 'tab')" id="bAbout">about</button>
+                <button class="tab" onclick="tab('Load', 'tab')" id="bLoad">import</button>
+                <button id="Download" onclick="create_palette()">export</button>
+                <select class ="editor-buttons active" name="editor-buttons" id="editor-buttons" onchange="tab( document.getElementById('editor-buttons').options[document.getElementById('editor-buttons').selectedIndex].value.charAt(0).toUpperCase() + document.getElementById('editor-buttons').options[document.getElementById('editor-buttons').selectedIndex].value.slice(1) , 'tab' )" value="objects">
+                    <option value="" disabled hidden id="select">select option</option>
+                    <option value="objects" class="tab" id="bObjects">objects</option>
+                    <option value="menu" class="tab" id="bMenu">menu</option>
+                    <option value="editor" class="tab" id="bEditor">editor</option>
+                    <option value="timebar" class="tab" id="bTimebar">timebar</option>
+                    <option value="headbands" class="tab" id="bHeadbands">headbands</option>
+                    <option value="effects" class="tab" id="bEffects">effects</option>
+                </select>
+            </div>
+            <div class="main-area">
+                <div class="full-page">
+                    <div id="Objects" class="page" style="display:block">
+                        <div class="listbox-area">
+                            <div class="left-area">
+                                <ul id="list_objects" tabindex="0" role="listbox" aria-labelledby="ss_elem"></ul>
+                            </div>
+                            <div id="Objects_Items" class="right-area"></div>
+                        </div>
+                    </div>
+                    <div id="Menu" class="page" style="display:none">
+                        <div class="listbox-area">
+                            <div class="left-area">
+                                <ul id="list_menu" tabindex="0" role="listbox" aria-labelledby="ss_elem"></ul>
+                            </div>
+                            <div id="Menu_Items" class="right-area"></div>
+                        </div>
+                    </div>
+                    <div id="Editor" class="page" style="display:none">
+                        <div class="listbox-area">
+                            <div class="left-area">
+                                <ul id="list_editor" tabindex="0" role="listbox" aria-labelledby="ss_elem"></ul>
+                            </div>
+                            <div id="Editor_Items" class="right-area"></div>
+                        </div>
+                    </div>
+                    <div id="Timebar" class="page" style="display:none">
+                        <div class="listbox-area">
+                            <div class="left-area">
+                                <ul id="list_timebar" tabindex="0" role="listbox" aria-labelledby="ss_elem"></ul>
+                            </div>
+                            <div id="Timebar_Items" class="right-area"></div>
+                        </div>
+                    </div>
+                    <div id="Headbands" class="page" style="display:none">
+                        <div class="listbox-area">
+                            <div class="left-area">
+                                <ul id="list_headbands" tabindex="0" role="listbox" aria-labelledby="ss_elem"></ul>
+                            </div>
+                            <div id="Headbands_Items" class="right-area"></div>
+                        </div>
+                    </div>
+                    <div id="Effects" class="page" style="display:none">
+                        <div class="listbox-area">
+                            <div class="left-area">
+                                <ul id="list_effects" tabindex="0" role="listbox" aria-labelledby="ss_elem"></ul>
+                            </div>
+                            <div id="Effects_Items" class="right-area"></div>
+                        </div>
+                    </div>
+                    <div id="Objects_Sprites" class="sprite-area">
+                        <canvas id="sprite-renderer" width="256px" height="256px"></canvas>
+                    </div>
+                </div>
+                <div id="About" class="page" style="display:none">
+                    <p>This will help you create your own customized color themes / palettes for N++.</p>
+                    <h2>How to use:</h2>
+                    <ul class="about">
+                        <li class="use">Load a palette by clicking the <strong>Import</strong> tab. It you're loading a custom palette a multiple selection dialog will open<br /> and you'll have to select all 35 files of the palette.</li>
+                        <li class="use">The colors are classified in tabs, and each tab has a list.<br /> <strong>Click</strong> on the list elements to view the colors for that element (e.g. <em>Objects</em> -&gt; <em>Exit door</em>).</li>
+                        <li class="use">Click the <strong>Export</strong> tab to generate the palette folder with all the files inside.<br /> The folder will be created in the program's folder, without dialog.</li>
+                    </ul>
+                    <h2>How to implement:</h2>
+                    <p>You will have to put the palette folder (which name will be the in-game name of the palette) into the <em>Palettes</em> folder of your N++ installation directory, inside your Steam folder. It should be something like this:</p>
+                    <ul class="about">
+                        <li class="implement"><strong>Linux</strong>: <code>home/&lt;user&gt;/.steam/steam/steamapps/common/N++/NPP/Palettes</code></li>
+                        <li class="implement"><strong>Windows</strong>: <code>SteamLibrary/steamapps/common/N++/NPP/Palettes</code></li>
+                        <li class="implement"><strong>Mac</strong>: <code>home/&lt;user&gt;/Library/ ... /steamapps/common/N++/NPP/Palettes</code></li>
+                    </ul>
+                    <p>Important note: It's likely you won't have a folder named <em>Palettes</em>, in which case you will have to <strong>create it</strong>.</p>
+                    <h2>Resources:</h2>
+                    <ul class="about">
+                        <li class="resources">Custom palette spreadsheet: <a href="https://docs.google.com/spreadsheets/d/1I2f87Qhfs6rxzZq5dQRDbLKYyaGLqTdCkLqfNfrw1Mk" rel="nofollow" target="_blank">https://docs.google.com/spreadsheets/d/1I2f87Qhfs6rxzZq5dQRDbLKYyaGLqTdCkLqfNfrw1Mk</a></li>
+                        <li class="resources">Palette color reference: <a href="https://pastebin.com/E01pEhy4" rel="nofollow" target="_blank">https://pastebin.com/E01pEhy4</a></li>
+                        <li class="resources">Outdated video tutorial: <a href="https://www.youtube.com/watch?v=Ql8gf6PPcUY" rel="nofollow" target="_blank">https://www.youtube.com/watch?v=Ql8gf6PPcUY</a></li>
+                        <li class="resources">Original Code Repository by Eddy: <a href="https://github.com/edelkas/npc-web" rel="nofollow" target="_blank">https://github.com/edelkas/npc-web</a></li>
+                    </ul>
+                </div>
+                <div id="Load" class="page" style="display:none">
+                    <p>Loading a palette will make you lose any unsaved changes!</p>
+                    <div class="metanet-block">
+                        <h2>Metanet Palettes</h2>
+                            <label for="default_palettes">Pick a Metanet Palette:</label>
+                            <select class="editor-buttons-imp" id="dpal"></select>
+                            <br /><br />
+                            <button id="file3" type="button">load metanet palette</button>
+                    </div>
+                    <!-- todo: drop down box listing all default palettes from Palettes.zip -->
+                    <!-- <h2>Custom Palettes</h2> -->
+                    <!-- todo: drop down box listing all default palettes from allpalettes.zip -->
+                    <div class="custom-block">
+                        <h2>Custom</h2>
+                        <input id="file" type="file" name="file" class="inputfile" multiple="multiple">
+                        <label for="file">load palette (35 .tga files)</label>
+                    </div>
+                </div>
+            </div>
+            <a download="info" id="downloadlink" style="display: none"></a>
+            <pre id="fileDisplayArea"></pre>
+
+
+            <div class="info-mobile">
+                <p class="info-mobile">We are sorry that the palette creator won't work at the moment on mobile devices.<br /><br />
+                    The palette creator is best used on a desktop computer.<br /><br />
+                    We might optimize it for tablets in the near future.
+                </p>
+            </div>
+            <!--<footer>
+                <table>
+                    <tr>
+                        <td>Author:</td>
+                        <td>Eddy</td>
+                    </tr>
+                    <tr>
+                        <td>Created:</td>
+                        <td>28/Jul/2019</td>
+                    </tr>
+                    <tr>
+                        <td>Updated:</td>
+                        <td>27/Aug/2019</td>
+                    </tr>
+                </table>
+            </footer>-->
+        </div>
+    </body>
+
+</html>
